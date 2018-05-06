@@ -1,0 +1,15 @@
+#!/bin/bash
+# Simple bash program to download music, It uses youtube-dl utility. by Lucas Ferrero
+if [ $# -eq 2 ] && [ -d $2 ];
+	then
+		youtube-dl --ignore-errors --ignore-config --restrict-filenames --newline \
+		--extract-audio --audio-quality 0 \
+		--embed-thumbnail --add-metadata --audio-format mp3 --exec "cp {} $2" $1;
+		if [ $? -ne 0 ]; 
+			then 
+				printf "\033[1;31mYou\'ve got an error, please update youtube-dl. To update youtube-dl just type youtub							e-dl -U\033[0m"
+				echo;
+		fi
+	else
+		echo "Use this script as follows: dmusic [ VIDEO_URL | PLAYLIST_URL ] DEST"
+fi
