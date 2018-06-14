@@ -8,7 +8,7 @@ then
     exit 2
 fi
 
-if [ -n $2 ];
+if [ -z $2 ];
 then
     DEST_PATH="./"
 else if [ -d $2 ] && [ -w $2 ];
@@ -19,12 +19,12 @@ else if [ -d $2 ] && [ -w $2 ];
 	 exit 2
      fi
 fi
-	
+echo "Destination: $DEST_PATH"
 if [ -n $1 ];
 then
     youtube-dl --ignore-errors --ignore-config --newline --output '%(title)s.%(ext)s' \
 	       --extract-audio --audio-quality 0 \
-	       --embed-thumbnail --add-metadata --audio-format best --exec "cp {} $DEST_PATH" $1;
+	       --embed-thumbnail --add-metadata --audio-format mp3 --exec "cp {} $DEST_PATH >/dev/null" $1;
 else
     echo "Use this script as follows: dmusic ( VIDEO_URL | PLAYLIST_URL ) [ DEST ]"
     exit 2
