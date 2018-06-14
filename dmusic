@@ -1,15 +1,32 @@
 #!/bin/bash
-# Simple bash program to download music, It uses youtube-dl utility. by Lucas Ferrero
-if [ $# -eq 2 ] && [ -d $2 ];
-	then
-		youtube-dl --ignore-errors --ignore-config --restrict-filenames --newline \
-		--extract-audio --audio-quality 0 \
-		--embed-thumbnail --add-metadata --audio-format mp3 --exec "cp {} $2" $1;
-		if [ $? -ne 0 ]; 
-			then 
-				printf "\033[1;31mYou\'ve got an error, please update youtube-dl. To update youtube-dl just type youtub							e-dl -U\033[0m"
-				echo;
-		fi
-	else
-		echo "Use this script as follows: dmusic [ VIDEO_URL | PLAYLIST_URL ] DEST"
+# Simple bash program to download music from youtube.
+DEST_PATH=""
+if ! which youtube-dl >/dev/null;
+then
+    echo "You must install youtube-dl utility to run this script."
+    echo "for more information visit: https://rg3.github.io/youtube-dl/download.html"
+    exit 2
 fi
+
+if [ -n $2 ];
+then
+    DEST_PATH="./"
+else if [ -d $2 ] && [ -w $2 ];
+     then
+	 DEST_PATH="$2"
+     else
+	 echo "The destination directory doesn't exist or you don't have permission in It."
+	 exit 2
+     fi
+fi
+	
+if [ -n $1 ];
+then
+    youtube-dl --ignore-errors --ignore-config --newline --output '%(title)s.%(ext)s' \
+	       --extract-audio --audio-quality 0 \
+	       --embed-thumbnail --add-metadata --audio-format best --exec "cp {} $DEST_PATH" $1;
+else
+    echo "Use this script as follows: dmusic ( VIDEO_URL | PLAYLIST_URL ) [ DEST ]"
+    exit 2
+fi
+exit 0
