@@ -11,20 +11,22 @@ fi
 if [ -z $2 ];
 then
     DEST_PATH="./"
-else if [ -d $2 ] && [ -w $2 ];
-     then
-	 DEST_PATH="$2"
-     else
-	 echo "The destination directory doesn't exist or you don't have permission in It."
-	 exit 2
-     fi
+else
+	DEST_PATH="$2"
 fi
-echo "Destination: $DEST_PATH"
-if [ -n $1 ];
+
+if ! [ -d $DEST_PATH ] || ! [ -w $DEST_PATH ];
+ then
+	 echo "The destination directory doesn't exist or you don't have permission on It."
+	 exit 2
+ fi
+
+if ! [ -z $1 ];
 then
-    youtube-dl --ignore-errors --ignore-config --newline --output '%(title)s.%(ext)s' \
-	       --extract-audio --audio-quality 0 \
-	       --embed-thumbnail --add-metadata --audio-format mp3 --exec "cp {} $DEST_PATH >/dev/null" $1;
+	echo "Destination: $DEST_PATH"
+   	youtube-dl --ignore-errors --ignore-config --newline --output "$DEST_PATH/%(title)s.%(ext)s" \
+     	--extract-audio --audio-quality 0 \
+       	--embed-thumbnail --add-metadata --audio-format mp3 $1;
 else
     echo "Use this script as follows: dmusic ( VIDEO_URL | PLAYLIST_URL ) [ DEST ]"
     exit 2
