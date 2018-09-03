@@ -1,5 +1,5 @@
 #!/bin/bash
-# Simple bash program to download music from youtube.
+# Simple bash program to download music from youtube using youtube-dl utility.
 DEST_PATH=""
 if ! which youtube-dl >/dev/null;
 then
