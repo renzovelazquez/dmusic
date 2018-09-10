@@ -1,6 +1,19 @@
 #!/bin/bash
 # Simple bash program to download music from youtube using youtube-dl utility.
 DEST_PATH=""
+HAS_PASSED_FOLDER=0
+declare -a URL_LIST
+
+showHelp(){
+	echo "Use this script as follows: dmusic ( VIDEO_URL | PLAYLIST_URL ) [ DEST ]"
+	exit 2
+}
+downloadMusic(){
+	youtube-dl --ignore-errors --ignore-config --newline --output "$DEST_PATH/%(title)s.%(ext)s" \
+     	--extract-audio --audio-quality 0 \
+       	--embed-thumbnail --add-metadata --audio-format mp3 ${URL_LIST[@]};
+	exit 0
+}
 if ! which youtube-dl >/dev/null;
 then
     echo "You must install youtube-dl utility to run this script."
@@ -8,27 +21,24 @@ then
     exit 2
 fi
 
-if [ -z $2 ];
-then
-    DEST_PATH="./"
-else
-	DEST_PATH="$2"
-fi
+[ "$#" -eq 0 ] && { showHelp; }
 
-if ! [ -d $DEST_PATH ] || ! [ -w $DEST_PATH ];
- then
-	 echo "The destination directory doesn't exist or you don't have permission on It."
-	 exit 2
- fi
-
-if ! [ -z $1 ];
-then
-	echo "Destination: $DEST_PATH"
-   	youtube-dl --ignore-errors --ignore-config --newline --output "$DEST_PATH/%(title)s.%(ext)s" \
-     	--extract-audio --audio-quality 0 \
-       	--embed-thumbnail --add-metadata --audio-format mp3 $1;
+# Check if last element is a folder.
+if [ -d "${@: -1}" ]; then
+	DEST_PATH="${@: -1}"
+	HAS_PASSED_FOLDER=1
 else
-    echo "Use this script as follows: dmusic ( VIDEO_URL | PLAYLIST_URL ) [ DEST ]"
-    exit 2
+	DEST_PATH="./"
 fi
-exit 0
+[ -w $DEST_PATH ] || { echo "You don't have permission on destination folder."; exit 2;}
+
+COUNTER=0
+for i do
+	COUNTER=$((COUNTER+1))
+	[ "$COUNTER" -eq $# ] && [ "$HAS_PASSED_FOLDER" -eq 1 ] && { break; }
+	URL_LIST+=($i)
+done
+
+[ "${#URL_LIST[@]}" -eq 0 ] && { showHelp; }
+
+downloadMusic
